@@ -52,6 +52,7 @@ plot <- plot +
 
 plot
 ```
+
 Let's see if we can add labels to those. This requires a bit of manual adjustment.
 
 
@@ -59,7 +60,7 @@ Let's see if we can add labels to those. This requires a bit of manual adjustmen
 hour_ends <- hours |> filter(month == "Jun")
 
 plot <- plot +
-  geom_label(data = hour_ends, nudge_y = -6, check_overlap = TRUE, label.padding = unit(0.1, "lines"), size = 2, aes(x = azimuth, y = zenith, label = hour))
+  geom_label(data = hour_ends, nudge_y = -6, label.padding = unit(0.1, "lines"), size = 2, aes(x = azimuth, y = zenith, label = hour))
 
 plot
 ```

@@ -76,20 +76,17 @@ plot <- plot +
 plot
 ```
 
-![](sunpath_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> Let’s see if
-we can add labels to those. This requires a bit of manual adjustment.
+![](sunpath_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+Let’s see if we can add labels to those. This requires a bit of manual
+adjustment.
 
 ``` r
 hour_ends <- hours |> filter(month == "Jun")
 
 plot <- plot +
-  geom_label(data = hour_ends, nudge_y = -6, check_overlap = TRUE, label.padding = unit(0.1, "lines"), size = 2, aes(x = azimuth, y = zenith, label = hour))
-```
+  geom_label(data = hour_ends, nudge_y = -6, label.padding = unit(0.1, "lines"), size = 2, aes(x = azimuth, y = zenith, label = hour))
 
-    ## Warning in geom_label(data = hour_ends, nudge_y = -6, check_overlap = TRUE, :
-    ## Ignoring unknown parameters: `check_overlap`
-
-``` r
 plot
 ```
 

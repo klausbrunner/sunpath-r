@@ -26,7 +26,7 @@ library(lubridate, warn.conflicts = FALSE)
 sunpath <- read_csv("/tmp/sunpositions.csv", 
                     col_names=c("daytime", "azimuth", "zenith"), 
                     show_col_types = FALSE) |> 
-  subset(subset = date(daytime) %in% seq(date("2023-01-21"), date("2023-12-21"), "months")) |> 
+  filter(day(daytime) == 21) |> 
   filter(zenith <= 90.0) |>
   mutate(month = month(daytime, label=TRUE))
 

@@ -1,5 +1,5 @@
 ---
-title: "Plotting a sun-path diagram using data from solarpos-cli"
+title: "Plotting a sun-path diagram in R using data from solarpos-cli"
 editor_options: 
   chunk_output_type: inline
 output: github_document
@@ -15,25 +15,42 @@ Now read that CSV and pick data for one day of each month. While we're at it, re
 
 ```{r}
 library(tidyverse)
+library(lubridate, warn.conflicts = FALSE)
 
 sunpath <- read_csv("/tmp/sunpositions.csv", 
                     col_names=c("daytime", "azimuth", "zenith"), 
                     show_col_types = FALSE) |> 
-  subset(subset = as.Date(daytime) %in% seq(as.Date("2023-01-15"), as.Date("2023-12-15"), "months")) |> 
+  subset(subset = date(daytime) %in% seq(date("2023-01-21"), date("2023-12-21"), "months")) |> 
   filter(zenith <= 90.0) |>
-  mutate(month = format(daytime, "%m"))
+  mutate(month = month(daytime, label=TRUE))
 
 sunpath
 ```
+
 Now plot a simple sun path diagram.
 
 ```{r}
-spplot <- ggplot(sunpath, aes(x = azimuth, y = zenith, color = month)) + 
-  geom_line() + 
+ggplot() + 
+  geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
   scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
   scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
   labs(title = "Sun path for Salzburg, Austria in 2023") +
   coord_polar()
-
-spplot
 ```
+
+Let's see if we can add the analemma lines for each hour as well.
+
+```{r}
+hours <- sunpath |>
+  filter(minute(daytime) == 0, second(daytime) == 0) |>
+  mutate(hour = hour(daytime))
+
+ggplot() + 
+  geom_line(data = sunpath, aes(x = azimuth, y = zenith, colour = month)) + 
+  geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
+  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
+  labs(title = "Sun path for Salzburg, Austria in 2023") +
+  coord_polar()
+```
+

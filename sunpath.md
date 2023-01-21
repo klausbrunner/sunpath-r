@@ -1,4 +1,4 @@
-Plotting a sun-path diagram using data from solarpos-cli
+Plotting a sun-path diagram in R using data from solarpos-cli
 ================
 
 First, run [solarpos-cli](https://github.com/KlausBrunner/solarpos-cli)
@@ -17,43 +17,64 @@ column. This will come in handy for the diagram.
 
 ``` r
 library(tidyverse)
+library(lubridate, warn.conflicts = FALSE)
+```
 
+    ## Loading required package: timechange
+
+``` r
 sunpath <- read_csv("/tmp/sunpositions.csv", 
                     col_names=c("daytime", "azimuth", "zenith"), 
                     show_col_types = FALSE) |> 
-  subset(subset = as.Date(daytime) %in% seq(as.Date("2023-01-15"), as.Date("2023-12-15"), "months")) |> 
+  subset(subset = date(daytime) %in% seq(date("2023-01-21"), date("2023-12-21"), "months")) |> 
   filter(zenith <= 90.0) |>
-  mutate(month = format(daytime, "%m"))
+  mutate(month = month(daytime, label=TRUE))
 
 sunpath
 ```
 
     ## # A tibble: 875 × 4
     ##    daytime             azimuth zenith month
-    ##    <dttm>                <dbl>  <dbl> <chr>
-    ##  1 2023-01-15 07:00:00    123.   89.3 01   
-    ##  2 2023-01-15 07:10:00    125.   88.0 01   
-    ##  3 2023-01-15 07:20:00    127.   86.7 01   
-    ##  4 2023-01-15 07:30:00    129.   85.5 01   
-    ##  5 2023-01-15 07:40:00    130.   84.2 01   
-    ##  6 2023-01-15 07:50:00    132.   83.0 01   
-    ##  7 2023-01-15 08:00:00    134.   81.7 01   
-    ##  8 2023-01-15 08:10:00    136.   80.6 01   
-    ##  9 2023-01-15 08:20:00    139.   79.5 01   
-    ## 10 2023-01-15 08:30:00    141.   78.4 01   
+    ##    <dttm>                <dbl>  <dbl> <ord>
+    ##  1 2023-01-21 06:50:00    120.   89.9 Jan  
+    ##  2 2023-01-21 07:00:00    122.   88.7 Jan  
+    ##  3 2023-01-21 07:10:00    124.   87.4 Jan  
+    ##  4 2023-01-21 07:20:00    126.   86.0 Jan  
+    ##  5 2023-01-21 07:30:00    127.   84.7 Jan  
+    ##  6 2023-01-21 07:40:00    129.   83.4 Jan  
+    ##  7 2023-01-21 07:50:00    131.   82.2 Jan  
+    ##  8 2023-01-21 08:00:00    133.   81.0 Jan  
+    ##  9 2023-01-21 08:10:00    135.   79.8 Jan  
+    ## 10 2023-01-21 08:20:00    138.   78.6 Jan  
     ## # … with 865 more rows
 
 Now plot a simple sun path diagram.
 
 ``` r
-spplot <- ggplot(sunpath, aes(x = azimuth, y = zenith, color = month)) + 
-  geom_line() + 
+ggplot() + 
+  geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
   scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
   scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
   labs(title = "Sun path for Salzburg, Austria in 2023") +
   coord_polar()
-
-spplot
 ```
 
 ![](sunpath_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+Let’s see if we can add the analemma lines for each hour as well.
+
+``` r
+hours <- sunpath |>
+  filter(minute(daytime) == 0, second(daytime) == 0) |>
+  mutate(hour = hour(daytime))
+
+ggplot() + 
+  geom_line(data = sunpath, aes(x = azimuth, y = zenith, colour = month)) + 
+  geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
+  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
+  labs(title = "Sun path for Salzburg, Austria in 2023") +
+  coord_polar()
+```
+
+![](sunpath_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->

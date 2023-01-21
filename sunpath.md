@@ -51,12 +51,14 @@ sunpath
 Now plot a simple sun path diagram.
 
 ``` r
-ggplot() + 
+plot <- ggplot() + 
   geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
   scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
-  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
+  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=15)) +
   labs(title = "Sun path for Salzburg, Austria in 2023") +
   coord_polar()
+
+plot
 ```
 
 ![](sunpath_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
@@ -68,13 +70,27 @@ hours <- sunpath |>
   filter(minute(daytime) == 0, second(daytime) == 0) |>
   mutate(hour = hour(daytime))
 
-ggplot() + 
-  geom_line(data = sunpath, aes(x = azimuth, y = zenith, colour = month)) + 
-  geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed") +
-  scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
-  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=10)) +
-  labs(title = "Sun path for Salzburg, Austria in 2023") +
-  coord_polar()
+plot <- plot + 
+  geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed")
+
+plot
 ```
 
-![](sunpath_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](sunpath_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> Let’s see if
+we can add labels to those. This requires a bit of manual adjustment.
+
+``` r
+hour_ends <- hours |> filter(month == "Jun")
+
+plot <- plot +
+  geom_label(data = hour_ends, nudge_y = -6, check_overlap = TRUE, label.padding = unit(0.1, "lines"), size = 2, aes(x = azimuth, y = zenith, label = hour))
+```
+
+    ## Warning in geom_label(data = hour_ends, nudge_y = -6, check_overlap = TRUE, :
+    ## Ignoring unknown parameters: `check_overlap`
+
+``` r
+plot
+```
+
+![](sunpath_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->

@@ -4,11 +4,11 @@ solarpos-cli data
 
 First, run [solarpos-cli](https://github.com/KlausBrunner/solarpos-cli)
 and capture its output in a CSV file. We’re getting position data for
-the entire year 2023 in Rome, Italy. Depending on your setup, you may
-have to add the “java” command and an absolute path.
+the entire year 2023 in Stockholm, Sweden. Depending on your setup, you
+may have to add the “java” command and an absolute path.
 
 ``` sh
-solarpos-cli.jar 41.8933 12.4828 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
+solarpos-cli.jar 59.325 18.05 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don’t need and regrouping the
@@ -40,16 +40,16 @@ sunpath
     ## # A tibble: 175,200 × 3
     ##    zenith date        time
     ##     <dbl> <date>     <dbl>
-    ##  1   159. 2023-01-01  0   
-    ##  2   158. 2023-01-01  0.05
-    ##  3   158. 2023-01-01  0.1 
-    ##  4   158. 2023-01-01  0.15
-    ##  5   158. 2023-01-01  0.2 
-    ##  6   157. 2023-01-01  0.25
-    ##  7   157. 2023-01-01  0.3 
-    ##  8   156. 2023-01-01  0.35
-    ##  9   156. 2023-01-01  0.4 
-    ## 10   156. 2023-01-01  0.45
+    ##  1   142. 2023-01-01  0   
+    ##  2   142. 2023-01-01  0.05
+    ##  3   141. 2023-01-01  0.1 
+    ##  4   141. 2023-01-01  0.15
+    ##  5   141. 2023-01-01  0.2 
+    ##  6   141. 2023-01-01  0.25
+    ##  7   141. 2023-01-01  0.3 
+    ##  8   140. 2023-01-01  0.35
+    ##  9   140. 2023-01-01  0.4 
+    ## 10   140. 2023-01-01  0.45
     ## # … with 175,190 more rows
 
 With the nicely prepared data, plotting should be straightforward now.
@@ -103,16 +103,16 @@ sunpath
     ## # A tibble: 175,200 × 4
     ##    zenith date        time light
     ##     <dbl> <date>     <dbl> <fct>
-    ##  1   159. 2023-01-01  0    night
-    ##  2   158. 2023-01-01  0.05 night
-    ##  3   158. 2023-01-01  0.1  night
-    ##  4   158. 2023-01-01  0.15 night
-    ##  5   158. 2023-01-01  0.2  night
-    ##  6   157. 2023-01-01  0.25 night
-    ##  7   157. 2023-01-01  0.3  night
-    ##  8   156. 2023-01-01  0.35 night
-    ##  9   156. 2023-01-01  0.4  night
-    ## 10   156. 2023-01-01  0.45 night
+    ##  1   142. 2023-01-01  0    night
+    ##  2   142. 2023-01-01  0.05 night
+    ##  3   141. 2023-01-01  0.1  night
+    ##  4   141. 2023-01-01  0.15 night
+    ##  5   141. 2023-01-01  0.2  night
+    ##  6   141. 2023-01-01  0.25 night
+    ##  7   141. 2023-01-01  0.3  night
+    ##  8   140. 2023-01-01  0.35 night
+    ##  9   140. 2023-01-01  0.4  night
+    ## 10   140. 2023-01-01  0.45 night
     ## # … with 175,190 more rows
 
 ``` r
@@ -142,5 +142,8 @@ plot
 ![](carpet_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Doesn’t have the same mysterious vibe as the previous ones, but it’s a
-bit more useful now. Of course, don’t forget all times are UTC. You can
-also tell solarpos-cli to use the proper local timezone (Europe/Rome).
+bit more useful now: we can clearly see those very long Northern summer
+days and depressingly short winter days, peaking on 21 December and 21
+June, respectively. Of course, don’t forget all times are UTC. You can
+also tell solarpos-cli to use the proper local timezone
+(Europe/Stockholm).

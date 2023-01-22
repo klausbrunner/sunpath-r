@@ -143,5 +143,4 @@ plot
 
 Doesn’t have the same mysterious vibe as the previous ones, but it’s a
 bit more useful now. Of course, don’t forget all times are UTC. You can
-also tell solarpos-cli to use the proper local timezone (Europe/Rome),
-which will include the DST transitions.
+also tell solarpos-cli to use the proper local timezone (Europe/Rome).

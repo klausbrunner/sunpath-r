@@ -143,7 +143,7 @@ plot
 
 Doesn’t have the same mysterious vibe as the previous ones, but it’s a
 bit more useful now: we can clearly see those very long Northern summer
-days and depressingly short winter days, peaking on 21 December and 21
-June, respectively. Of course, don’t forget all times are UTC. You can
-also tell solarpos-cli to use the proper local timezone
+days and depressingly short winter days, peaking on 21 June and 21
+December, respectively. Of course, don’t forget all times are UTC. You
+can also tell solarpos-cli to use the proper local timezone
 (Europe/Stockholm).

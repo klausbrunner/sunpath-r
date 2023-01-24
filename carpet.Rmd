@@ -1,15 +1,15 @@
 ---
-title: "A temporal raster plot (carpet diagram) of sunshine based on solarpos-cli data"
+title: "A temporal raster plot (carpet diagram) of annual sunlight based on solarpos-cli data"
 editor_options: 
   chunk_output_type: inline
 output: github_document
 ---
 
-First, run [solarpos-cli](https://github.com/KlausBrunner/solarpos-cli) and capture its output in a CSV file. We're getting position data for the entire year 2023 in Stockholm, Sweden. Depending on your setup, you may have to add the "java" command and an absolute path.
+First, run [solarpos-cli](https://github.com/KlausBrunner/solarpos-cli) and capture its output in a CSV file. We're getting position data for the entire year 2023 in Oulu, Finland. Depending on your setup, you may have to add the "java" command and an absolute path.
 
 
 ```{sh}
-solarpos-cli.jar 59.325 18.05 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
+solarpos-cli.jar 65.013 25.473 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don't need and regrouping the data a bit for convenient plotting.
@@ -65,19 +65,26 @@ Aesthetically better, but still hard to make sense of. It really seems we need a
 sunpath <- sunpath |>
   mutate(light = cut(
     zenith,
-    labels = c("day", "golden hour", "civil twl", "nautical twl", "astronomical twl", "night"),
+    labels = c(
+      "day",
+      "golden hour",
+      "civil twl",
+      "nautical twl",
+      "astronomical twl",
+      "night"
+    ),
     breaks = c(0, 84, 90, 96, 102, 108, 180)
   ))
 
 sunpath
 
 plot <- ggplot(sunpath, aes(date, time)) +
-  geom_raster(aes(fill = light), interpolate = TRUE) +
+  geom_raster(aes(fill = light), alpha = 0.85) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 24, 3)) +
+  labs(title = "2023 Sunlight hours in Oulu, Finland") +
   scale_x_date(
     labels = date_format("%m"),
     breaks = breaks_width("month"),
-    
     expand = c(0, 0)
   ) +
   scale_fill_manual(
@@ -95,6 +102,6 @@ plot
 
 ```
 
-Doesn't have the same mysterious vibe as the previous ones, but it's a bit more useful now: we can clearly see those very long Northern summer days and depressingly short winter days, peaking on 21 June and 21 December, respectively. Of course, don't forget all times are UTC. You can also tell solarpos-cli to use the proper local timezone (Europe/Stockholm).
+Doesn't have the same mysterious vibe as the previous ones, but it's a bit more useful now: we can clearly see those very long Northern summer days and depressingly long winter nights, peaking on 21 June and 21 December, respectively. Of course, don't forget all times are UTC. You can also tell solarpos-cli to use the proper local timezone (Europe/Helsinki).
 
 

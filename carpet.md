@@ -2,13 +2,13 @@ A temporal raster plot (carpet diagram) of annual sunlight based on
 solarpos-cli data
 ================
 
-First, run [solarpos-cli](https://github.com/KlausBrunner/solarpos-cli)
-and capture its output in a CSV file. We’re getting position data for
-the entire year 2023 in Oulu, Finland. Depending on your setup, you may
-have to add the “java” command and an absolute path.
+First, run [solarpos](https://github.com/KlausBrunner/solarpos) and
+capture its output in a CSV file. We’re getting position data for the
+entire year 2023 in Oulu, Finland. Depending on your setup, you may have
+to add the “java” command and an absolute path.
 
 ``` sh
-solarpos-cli.jar 65.013 25.473 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
+solarpos 65.013 25.473 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don’t need and regrouping the
@@ -154,3 +154,5 @@ days and depressingly long winter nights, peaking on 21 June and 21
 December, respectively. Of course, don’t forget all times are UTC. You
 can also tell solarpos-cli to use the proper local timezone
 (Europe/Helsinki).
+
+Next up: smoothing the contours…

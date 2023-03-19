@@ -1,13 +1,13 @@
-Plotting a sun-path diagram in R using data from solarpos-cli
+Plotting a sun-path diagram in R using data from solarpos
 ================
 
-First, run [solarpos](https://github.com/KlausBrunner/solarpos) and
+First, run [solarpos](https://github.com/klausbrunner/solarpos) and
 capture its output in a CSV file. We’re getting position data for the
 entire year 2023 in Salzburg, Austria. Depending on your setup, you may
 have to add the “java” command and an absolute path.
 
-``` sh
-solarpos 47.795 13.047 2023 --timezone UTC --deltat --format=csv position --step=600 > /tmp/sunpositions.csv
+``` zsh
+solarpos 47.795 13.047 2023 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV and pick data for one day of each month. While we’re
@@ -18,23 +18,18 @@ column. This will come in handy for the diagram.
 ``` r
 library(tidyverse)
 library(lubridate, warn.conflicts = FALSE)
-```
 
-    ## Loading required package: timechange
-
-``` r
 sunpath <- read_csv("/tmp/sunpositions.csv", 
-                    col_names=c("daytime", "azimuth", "zenith"), 
                     show_col_types = FALSE) |> 
-  filter(day(daytime) == 21) |> 
+  filter(day(dateTime) == 21) |> 
   filter(zenith <= 90.0) |>
-  mutate(month = month(daytime, label=TRUE))
+  mutate(month = month(dateTime, label=TRUE))
 
 sunpath
 ```
 
     ## # A tibble: 875 × 4
-    ##    daytime             azimuth zenith month
+    ##    dateTime            azimuth zenith month
     ##    <dttm>                <dbl>  <dbl> <ord>
     ##  1 2023-01-21 06:50:00    120.   89.9 Jan  
     ##  2 2023-01-21 07:00:00    122.   88.7 Jan  
@@ -67,8 +62,8 @@ Let’s see if we can add the analemma lines for each hour as well.
 
 ``` r
 hours <- sunpath |>
-  filter(minute(daytime) == 0, second(daytime) == 0) |>
-  mutate(hour = hour(daytime))
+  filter(minute(dateTime) == 0, second(dateTime) == 0) |>
+  mutate(hour = hour(dateTime))
 
 plot <- plot + 
   geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed")

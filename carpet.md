@@ -1,14 +1,14 @@
 A temporal raster plot (carpet diagram) of annual sunlight based on
-solarpos-cli data
+solarpos data
 ================
 
-First, run [solarpos](https://github.com/KlausBrunner/solarpos) and
+First, run [solarpos](https://github.com/klausbrunner/solarpos) and
 capture its output in a CSV file. We’re getting position data for the
 entire year 2023 in Oulu, Finland. Depending on your setup, you may have
 to add the “java” command and an absolute path.
 
-``` sh
-solarpos 65.013 25.473 2023 --timezone UTC --deltat --format=csv position --step=180 > /tmp/sunpositions.csv
+``` zsh
+solarpos 65.013 25.473 2023 --timezone UTC --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don’t need and regrouping the
@@ -17,19 +17,14 @@ data a bit for convenient plotting.
 ``` r
 library(tidyverse)
 library(lubridate, warn.conflicts = FALSE)
-```
 
-    ## Loading required package: timechange
-
-``` r
 sunpath <- read_csv(
   "/tmp/sunpositions.csv",
-  col_names = c("daytime", "azimuth", "zenith"),
   show_col_types = FALSE
 ) |>
   mutate(
-    date = date(daytime),
-    time = hour(daytime) + minute(daytime) / 60,
+    date = date(dateTime),
+    time = hour(dateTime) + minute(dateTime) / 60,
     azimuth = NULL,
     daytime = NULL
   )
@@ -37,19 +32,19 @@ sunpath <- read_csv(
 sunpath
 ```
 
-    ## # A tibble: 175,200 × 3
-    ##    zenith date        time
-    ##     <dbl> <date>     <dbl>
-    ##  1   135. 2023-01-01  0   
-    ##  2   135. 2023-01-01  0.05
-    ##  3   135. 2023-01-01  0.1 
-    ##  4   135. 2023-01-01  0.15
-    ##  5   134. 2023-01-01  0.2 
-    ##  6   134. 2023-01-01  0.25
-    ##  7   134. 2023-01-01  0.3 
-    ##  8   134. 2023-01-01  0.35
-    ##  9   134. 2023-01-01  0.4 
-    ## 10   133. 2023-01-01  0.45
+    ## # A tibble: 175,200 × 4
+    ##    dateTime            zenith date        time
+    ##    <dttm>               <dbl> <date>     <dbl>
+    ##  1 2023-01-01 00:00:00   135. 2023-01-01  0   
+    ##  2 2023-01-01 00:03:00   135. 2023-01-01  0.05
+    ##  3 2023-01-01 00:06:00   135. 2023-01-01  0.1 
+    ##  4 2023-01-01 00:09:00   135. 2023-01-01  0.15
+    ##  5 2023-01-01 00:12:00   134. 2023-01-01  0.2 
+    ##  6 2023-01-01 00:15:00   134. 2023-01-01  0.25
+    ##  7 2023-01-01 00:18:00   134. 2023-01-01  0.3 
+    ##  8 2023-01-01 00:21:00   134. 2023-01-01  0.35
+    ##  9 2023-01-01 00:24:00   134. 2023-01-01  0.4 
+    ## 10 2023-01-01 00:27:00   133. 2023-01-01  0.45
     ## # … with 175,190 more rows
 
 With the nicely prepared data, plotting should be straightforward now.
@@ -107,19 +102,19 @@ sunpath <- sunpath |>
 sunpath
 ```
 
-    ## # A tibble: 175,200 × 4
-    ##    zenith date        time light
-    ##     <dbl> <date>     <dbl> <fct>
-    ##  1   135. 2023-01-01  0    night
-    ##  2   135. 2023-01-01  0.05 night
-    ##  3   135. 2023-01-01  0.1  night
-    ##  4   135. 2023-01-01  0.15 night
-    ##  5   134. 2023-01-01  0.2  night
-    ##  6   134. 2023-01-01  0.25 night
-    ##  7   134. 2023-01-01  0.3  night
-    ##  8   134. 2023-01-01  0.35 night
-    ##  9   134. 2023-01-01  0.4  night
-    ## 10   133. 2023-01-01  0.45 night
+    ## # A tibble: 175,200 × 5
+    ##    dateTime            zenith date        time light
+    ##    <dttm>               <dbl> <date>     <dbl> <fct>
+    ##  1 2023-01-01 00:00:00   135. 2023-01-01  0    night
+    ##  2 2023-01-01 00:03:00   135. 2023-01-01  0.05 night
+    ##  3 2023-01-01 00:06:00   135. 2023-01-01  0.1  night
+    ##  4 2023-01-01 00:09:00   135. 2023-01-01  0.15 night
+    ##  5 2023-01-01 00:12:00   134. 2023-01-01  0.2  night
+    ##  6 2023-01-01 00:15:00   134. 2023-01-01  0.25 night
+    ##  7 2023-01-01 00:18:00   134. 2023-01-01  0.3  night
+    ##  8 2023-01-01 00:21:00   134. 2023-01-01  0.35 night
+    ##  9 2023-01-01 00:24:00   134. 2023-01-01  0.4  night
+    ## 10 2023-01-01 00:27:00   133. 2023-01-01  0.45 night
     ## # … with 175,190 more rows
 
 ``` r

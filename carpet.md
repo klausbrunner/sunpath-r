@@ -16,6 +16,20 @@ data a bit for convenient plotting.
 
 ``` r
 library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.1     ✔ readr     2.1.4
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ## ✔ ggplot2   3.4.1     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ## ✔ purrr     1.0.1     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(lubridate, warn.conflicts = FALSE)
 
 sunpath <- read_csv(
@@ -45,7 +59,7 @@ sunpath
     ##  8 2023-01-01 00:21:00   134. 2023-01-01  0.35
     ##  9 2023-01-01 00:24:00   134. 2023-01-01  0.4 
     ## 10 2023-01-01 00:27:00   133. 2023-01-01  0.45
-    ## # … with 175,190 more rows
+    ## # ℹ 175,190 more rows
 
 With the nicely prepared data, plotting should be straightforward now.
 Getting the axes and labelling right is a bit of a hassle, though.
@@ -115,7 +129,7 @@ sunpath
     ##  8 2023-01-01 00:21:00   134. 2023-01-01  0.35 night
     ##  9 2023-01-01 00:24:00   134. 2023-01-01  0.4  night
     ## 10 2023-01-01 00:27:00   133. 2023-01-01  0.45 night
-    ## # … with 175,190 more rows
+    ## # ℹ 175,190 more rows
 
 ``` r
 plot <- ggplot(sunpath, aes(date, time)) +
@@ -150,4 +164,36 @@ December, respectively. Of course, don’t forget all times are UTC. You
 can also tell solarpos-cli to use the proper local timezone
 (Europe/Helsinki).
 
-Next up: smoothing the contours…
+One of the problems here is that the contours aren’t smooth. Which is
+likely because we’re using a raster plot: basically a point matrix. What
+if we used an actual contour plot after all?
+
+``` r
+plot <- ggplot(sunpath, aes(date, time)) +
+  geom_contour_filled(aes(z = zenith),
+                      breaks = c(0, 84, 90, 96, 102, 108, 180),
+                      alpha = 0.85) +
+  scale_fill_manual(
+    name = "light",
+    values = c("lightyellow", "gold", "lightblue", "blue", "blue4", "black"),
+    labels = c(
+      "daylight",
+      "golden hour",
+      "civil twilight",
+      "nautical twilight",
+      "astronomical twilight",
+      "night"
+    )
+  ) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 24, 3)) +
+  labs(title = "2023 Sunlight hours in Oulu, Finland") +
+  scale_x_date(
+    labels = date_format("%m"),
+    breaks = breaks_width("month"),
+    expand = c(0, 0)
+  )
+
+plot
+```
+
+![](carpet_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->

@@ -103,4 +103,33 @@ plot
 
 Doesn't have the same mysterious vibe as the previous ones, but it's a bit more useful now: we can clearly see those very long Northern summer days and depressingly long winter nights, peaking on 21 June and 21 December, respectively. Of course, don't forget all times are UTC. You can also tell solarpos-cli to use the proper local timezone (Europe/Helsinki).
 
-Next up: smoothing the contours...
+One of the problems here is that the contours aren't smooth. Which is likely because we're using a raster plot: basically a point matrix. What if we used an actual contour plot after all?
+
+```{r}
+plot <- ggplot(sunpath, aes(date, time)) +
+  geom_contour_filled(aes(z = zenith),
+                      breaks = c(0, 84, 90, 96, 102, 108, 180),
+                      alpha = 0.85) +
+  scale_fill_manual(
+    name = "light",
+    values = c("lightyellow", "gold", "lightblue", "blue", "blue4", "black"),
+    labels = c(
+      "daylight",
+      "golden hour",
+      "civil twilight",
+      "nautical twilight",
+      "astronomical twilight",
+      "night"
+    )
+  ) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 24, 3)) +
+  labs(title = "2023 Sunlight hours in Oulu, Finland") +
+  scale_x_date(
+    labels = date_format("%m"),
+    breaks = breaks_width("month"),
+    expand = c(0, 0)
+  )
+
+plot
+`````
+

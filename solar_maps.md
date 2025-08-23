@@ -1,0 +1,157 @@
+Solar Elevation Across Europe
+================
+
+This demonstrates the `solarpos` geographic sweep and time series
+features.
+
+## Data Generation
+
+Generate solar elevation data across Europe using coordinate ranges:
+
+``` r
+library(tidyverse)
+library(lubridate)
+
+# Generate European solar elevation data using solarpos geographic sweep
+system(
+  "solarpos --format=csv --headers 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00Z position > /tmp/europe_dense.csv"
+)
+
+solar_data <- read_csv("/tmp/europe_dense.csv", show_col_types = FALSE) |>
+  mutate(elevation = 90 - zenith)
+
+cat("Dataset:", nrow(solar_data), "points\n")
+```
+
+    ## Dataset: 9379 points
+
+``` r
+cat("Elevation range:", round(min(solar_data$elevation), 1), "to", round(max(solar_data$elevation), 1), "degrees\n")
+```
+
+    ## Elevation range: 35.3 to 81.4 degrees
+
+## Visualization
+
+Create a filled contour map showing solar elevation gradients:
+
+``` r
+solar_map <- ggplot(solar_data, aes(x = longitude, y = latitude)) +
+  borders(
+    "world",
+    colour = "white",
+    fill = "grey20",
+    size = 0.3,
+    alpha = 0.8
+  ) +
+  geom_contour_filled(aes(z = elevation), alpha = 0.85, bins = 20) +
+  scale_fill_viridis_d(option = "plasma") +
+  guides(fill = "none") +
+  coord_quickmap(xlim = c(-10, 40), ylim = c(35, 70)) +
+  labs(
+    title = "Solar Elevation",
+    subtitle = "Summer Solstice 2027, GMT noon",
+    x = "Longitude",
+    y = "Latitude",
+    caption = "Generated with solarpos geographic sweep."
+  )
+
+solar_map
+```
+
+![](solar_maps_files/figure-gfm/solar-map-1.png)<!-- -->
+
+This shows how solar elevation varies across Europe at GMT/UTC noon on
+the summer solstice, with higher elevations (brighter colors) in
+southern regions and lower elevations (darker colors) in northern
+regions.
+
+## Time Series
+
+Now let’s see how this solar elevation pattern changes throughout the
+day by asking `solarpos` for a combined coordinate sweep and time series
+in one call. Use the Grena3 algorithm to potentially save a little time.
+
+``` r
+result <- system(
+  "solarpos --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=3600 --algorithm=GRENA3 > /tmp/europe_time_series.csv"
+)
+
+raw_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE)
+time_data <- raw_data |>
+  mutate(
+    elevation = 90 - zenith,
+    datetime_parsed = as.POSIXct(dateTime),
+    hour = hour(datetime_parsed)
+  )
+
+cat("Unique hours in data:", sort(unique(time_data$hour)), "\n")
+```
+
+    ## Unique hours in data: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+
+``` r
+time_data <- time_data |>
+  filter(hour >= 6, hour <= 18, !is.na(elevation)) %>%
+  arrange(hour, latitude, longitude)
+
+time_data
+```
+
+    ## # A tibble: 8,294 × 11
+    ##    latitude longitude elevation pressure temperature dateTime            deltaT
+    ##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
+    ##  1       32       -13      2.02     1013          15 2027-06-21 06:00:00      0
+    ##  2       32       -11      3.46     1013          15 2027-06-21 06:00:00      0
+    ##  3       32        -9      4.94     1013          15 2027-06-21 06:00:00      0
+    ##  4       32        -7      6.46     1013          15 2027-06-21 06:00:00      0
+    ##  5       32        -5      7.99     1013          15 2027-06-21 06:00:00      0
+    ##  6       32        -3      9.55     1013          15 2027-06-21 06:00:00      0
+    ##  7       32        -1     11.1      1013          15 2027-06-21 06:00:00      0
+    ##  8       32         1     12.7      1013          15 2027-06-21 06:00:00      0
+    ##  9       32         3     14.3      1013          15 2027-06-21 06:00:00      0
+    ## 10       32         5     15.9      1013          15 2027-06-21 06:00:00      0
+    ## # ℹ 8,284 more rows
+    ## # ℹ 4 more variables: azimuth <dbl>, zenith <dbl>, datetime_parsed <dttm>,
+    ## #   hour <int>
+
+``` r
+# Create faceted plot showing solar elevation throughout the day
+selected_hours <- c(8, 10, 12, 14, 16, 18)
+facet_data <- time_data |> 
+  filter(hour %in% selected_hours) |>
+  mutate(hour_label = paste0(sprintf("%02d", hour), ":00 UTC"))
+
+time_series_plot <- ggplot(facet_data, aes(x = longitude, y = latitude)) +
+  borders(
+    "world",
+    colour = "white",
+    fill = "grey20",
+    size = 0.3,
+    alpha = 0.8
+  ) +
+  geom_contour_filled(aes(z = elevation), alpha = 0.85, bins = 20) +
+  scale_fill_viridis_d(option = "plasma") +
+  guides(fill = "none") +
+  coord_quickmap(xlim = c(-10, 40), ylim = c(35, 70)) +
+  facet_wrap(~hour_label, ncol = 3) +
+  labs(
+    title = "Solar Elevation Throughout the Day",
+    subtitle = "Summer Solstice 2027",
+    x = "Longitude",
+    y = "Latitude",
+    caption = "Generated with solarpos time series and geographic sweep."
+  ) +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12)
+  )
+
+time_series_plot
+```
+
+![](solar_maps_files/figure-gfm/faceted-time-series-1.png)<!-- -->
+
+These time series snapshots show the “solar elevation wave” moving
+across Europe throughout the day.

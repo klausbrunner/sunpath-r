@@ -3,11 +3,11 @@ Plotting a sun-path diagram in R using data from solarpos
 
 First, run [solarpos](https://github.com/klausbrunner/solarpos) and
 capture its output in a CSV file. We’re getting position data for the
-entire year 2023 in Salzburg, Austria. Depending on your setup, you may
+entire year 2030 in Salzburg, Austria. Depending on your setup, you may
 have to add the “java” command and an absolute path.
 
 ``` zsh
-solarpos 47.795 13.047 2023 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
+solarpos 47.795 13.047 2030 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV and pick data for one day of each month. While we’re
@@ -28,20 +28,20 @@ sunpath <- read_csv("/tmp/sunpositions.csv",
 sunpath
 ```
 
-    ## # A tibble: 875 × 4
+    ## # A tibble: 876 × 4
     ##    dateTime            azimuth zenith month
     ##    <dttm>                <dbl>  <dbl> <ord>
-    ##  1 2023-01-21 06:50:00    120.   89.9 Jan  
-    ##  2 2023-01-21 07:00:00    122.   88.7 Jan  
-    ##  3 2023-01-21 07:10:00    124.   87.4 Jan  
-    ##  4 2023-01-21 07:20:00    126.   86.0 Jan  
-    ##  5 2023-01-21 07:30:00    127.   84.7 Jan  
-    ##  6 2023-01-21 07:40:00    129.   83.4 Jan  
-    ##  7 2023-01-21 07:50:00    131.   82.2 Jan  
-    ##  8 2023-01-21 08:00:00    133.   81.0 Jan  
-    ##  9 2023-01-21 08:10:00    135.   79.8 Jan  
-    ## 10 2023-01-21 08:20:00    138.   78.6 Jan  
-    ## # … with 865 more rows
+    ##  1 2030-01-21 06:50:00    120.   89.9 Jan  
+    ##  2 2030-01-21 07:00:00    122.   88.6 Jan  
+    ##  3 2030-01-21 07:10:00    124.   87.3 Jan  
+    ##  4 2030-01-21 07:20:00    125.   86.0 Jan  
+    ##  5 2030-01-21 07:30:00    127.   84.7 Jan  
+    ##  6 2030-01-21 07:40:00    129.   83.4 Jan  
+    ##  7 2030-01-21 07:50:00    131.   82.1 Jan  
+    ##  8 2030-01-21 08:00:00    133.   80.9 Jan  
+    ##  9 2030-01-21 08:10:00    135.   79.7 Jan  
+    ## 10 2030-01-21 08:20:00    138.   78.6 Jan  
+    ## # ℹ 866 more rows
 
 Now plot a simple sun path diagram.
 
@@ -50,7 +50,7 @@ plot <- ggplot() +
   geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
   scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
   scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=15)) +
-  labs(title = "Sun path for Salzburg, Austria in 2023") +
+  labs(title = "Sun path for Salzburg, Austria in 2030") +
   coord_polar()
 
 plot

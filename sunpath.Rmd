@@ -5,10 +5,10 @@ editor_options:
 output: github_document
 ---
 
-First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2023 in Salzburg, Austria. Depending on your setup, you may have to add the "java" command and an absolute path.
+First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2030 in Salzburg, Austria. Depending on your setup, you may have to add the "java" command and an absolute path.
 
 ```{zsh}
-solarpos 47.795 13.047 2023 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
+solarpos 47.795 13.047 2030 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV and pick data for one day of each month. While we're at it, remove all observations where the sun isn't visible anyway (i.e. zenith angle is greater than 90°) and add a convenient "month" column. This will come in handy for the diagram.
@@ -33,7 +33,7 @@ plot <- ggplot() +
   geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
   scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
   scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=15)) +
-  labs(title = "Sun path for Salzburg, Austria in 2023") +
+  labs(title = "Sun path for Salzburg, Austria in 2030") +
   coord_polar()
 
 plot

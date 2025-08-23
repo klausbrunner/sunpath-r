@@ -5,11 +5,11 @@ editor_options:
 output: github_document
 ---
 
-First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2023 in Oulu, Finland. Depending on your setup, you may have to add the "java" command and an absolute path.
+First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2025 in Oulu, Finland. Depending on your setup, you may have to add the "java" command and an absolute path.
 
 
 ```{zsh}
-solarpos 65.013 25.473 2023 --timezone UTC --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
+solarpos 65.01 25.47 2025 --timezone "UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don't need and regrouping the data a bit for convenient plotting.
@@ -18,10 +18,8 @@ Now read that CSV file, dropping what we don't need and regrouping the data a bi
 library(tidyverse)
 library(lubridate, warn.conflicts = FALSE)
 
-sunpath <- read_csv(
-  "/tmp/sunpositions.csv",
-  show_col_types = FALSE
-) |>
+sunpath <-
+  read_csv("/tmp/sunpositions.csv", show_col_types = FALSE)  |>
   mutate(
     date = date(dateTime),
     time = hour(dateTime) + minute(dateTime) / 60,
@@ -80,7 +78,7 @@ sunpath
 plot <- ggplot(sunpath, aes(date, time)) +
   geom_raster(aes(fill = light), alpha = 0.85) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 24, 3)) +
-  labs(title = "2023 Sunlight hours in Oulu, Finland") +
+  labs(title = "2025 Sunlight hours in Oulu, Finland") +
   scale_x_date(
     labels = date_format("%m"),
     breaks = breaks_width("month"),
@@ -101,7 +99,7 @@ plot
 
 ```
 
-Doesn't have the same mysterious vibe as the previous ones, but it's a bit more useful now: we can clearly see those very long Northern summer days and depressingly long winter nights, peaking on 21 June and 21 December, respectively. Of course, don't forget all times are UTC. You can also tell solarpos-cli to use the proper local timezone (Europe/Helsinki).
+Doesn't have the same mysterious vibe as the previous ones, but it's a bit more useful now: we can clearly see those very long Northern summer days and depressingly long winter nights, peaking on 21 June and 21 December, respectively. 
 
 One of the problems here is that the contours aren't smooth. Which is likely because we're using a raster plot: basically a point matrix. What if we used an actual contour plot after all?
 
@@ -123,13 +121,12 @@ plot <- ggplot(sunpath, aes(date, time)) +
     )
   ) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(0, 24, 3)) +
-  labs(title = "2023 Sunlight hours in Oulu, Finland") +
+  labs(title = "2025 Sunlight hours in Oulu, Finland") +
   scale_x_date(
     labels = date_format("%m"),
     breaks = breaks_width("month"),
     expand = c(0, 0)
-  )
-
+  ) 
 plot
-`````
+```
 

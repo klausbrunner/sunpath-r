@@ -1,14 +1,14 @@
 ---
-title: "Plotting a sun-path diagram in R using data from solarpos"
+title: "Plotting a sun-path diagram in R using data from sunce"
 editor_options: 
   chunk_output_type: inline
 output: github_document
 ---
 
-First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2030 in Salzburg, Austria. Depending on your setup, you may have to add the "java" command and an absolute path.
+First, run [sunce](https://github.com/klausbrunner/sunce) and capture its output in a CSV file. We're getting position data for the entire year 2030 in Salzburg, Austria. 
 
 ```{zsh}
-solarpos 47.795 13.047 2030 --timezone UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
+sunce 47.795 13.047 2030 --timezone=UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV and pick data for one day of each month. While we're at it, remove all observations where the sun isn't visible anyway (i.e. zenith angle is greater than 90°) and add a convenient "month" column. This will come in handy for the diagram.

@@ -1,15 +1,15 @@
 ---
-title: "A temporal raster plot (carpet diagram) of annual sunlight based on solarpos data"
+title: "A temporal raster plot (carpet diagram) of annual sunlight based on sunce data"
 editor_options: 
   chunk_output_type: inline
 output: github_document
 ---
 
-First, run [solarpos](https://github.com/klausbrunner/solarpos) and capture its output in a CSV file. We're getting position data for the entire year 2025 in Oulu, Finland. Depending on your setup, you may have to add the "java" command and an absolute path.
+First, run [sunce](https://github.com/klausbrunner/sunce) and capture its output in a CSV file. We're getting position data for the entire year 2025 in Oulu, Finland. 
 
 
 ```{zsh}
-solarpos 65.01 25.47 2025 --timezone "UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
+sunce 65.01 25.47 2025 --timezone="UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don't need and regrouping the data a bit for convenient plotting.

@@ -1,8 +1,7 @@
 Solar Elevation Across Europe
 ================
 
-This demonstrates the `solarpos` geographic sweep and time series
-features.
+This demonstrates the `sunce` geographic sweep and time series features.
 
 ## Data Generation
 
@@ -12,9 +11,9 @@ Generate solar elevation data across Europe using coordinate ranges:
 library(tidyverse)
 library(lubridate)
 
-# Generate European solar elevation data using solarpos geographic sweep
+# Generate European solar elevation data using sunce geographic sweep
 system(
-  "solarpos --format=csv --headers 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00Z position > /tmp/europe_dense.csv"
+  "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position > /tmp/europe_dense.csv"
 )
 
 solar_data <- read_csv("/tmp/europe_dense.csv", show_col_types = FALSE) |>
@@ -53,7 +52,7 @@ solar_map <- ggplot(solar_data, aes(x = longitude, y = latitude)) +
     subtitle = "Summer Solstice 2027, GMT noon",
     x = "Longitude",
     y = "Latitude",
-    caption = "Generated with solarpos geographic sweep."
+    caption = "Generated with sunce geographic sweep."
   )
 
 solar_map
@@ -69,12 +68,12 @@ regions.
 ## Time Series
 
 Now let’s see how this solar elevation pattern changes throughout the
-day by asking `solarpos` for a combined coordinate sweep and time series
-in one call. Use the Grena3 algorithm to potentially save a little time.
+day by asking `sunce` for a combined coordinate sweep and time series in
+one call. Use the Grena3 algorithm to potentially save a little time.
 
 ``` r
 result <- system(
-  "solarpos --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=3600 --algorithm=GRENA3 > /tmp/europe_time_series.csv"
+  "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=3600 --algorithm=GRENA3 > /tmp/europe_time_series.csv"
 )
 
 raw_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE)
@@ -98,7 +97,7 @@ time_data <- time_data |>
 time_data
 ```
 
-    ## # A tibble: 8,294 × 11
+    ## # A tibble: 7,917 × 11
     ##    latitude longitude elevation pressure temperature dateTime            deltaT
     ##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
     ##  1       32       -13      2.02     1013          15 2027-06-21 06:00:00      0
@@ -111,7 +110,7 @@ time_data
     ##  8       32         1     12.7      1013          15 2027-06-21 06:00:00      0
     ##  9       32         3     14.3      1013          15 2027-06-21 06:00:00      0
     ## 10       32         5     15.9      1013          15 2027-06-21 06:00:00      0
-    ## # ℹ 8,284 more rows
+    ## # ℹ 7,907 more rows
     ## # ℹ 4 more variables: azimuth <dbl>, zenith <dbl>, datetime_parsed <dttm>,
     ## #   hour <int>
 
@@ -140,7 +139,7 @@ time_series_plot <- ggplot(facet_data, aes(x = longitude, y = latitude)) +
     subtitle = "Summer Solstice 2027",
     x = "Longitude",
     y = "Latitude",
-    caption = "Generated with solarpos time series and geographic sweep."
+    caption = "Generated with sunce time series and geographic sweep."
   ) +
   theme(
     strip.text = element_text(size = 12, face = "bold"),

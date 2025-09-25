@@ -1,14 +1,14 @@
 A temporal raster plot (carpet diagram) of annual sunlight based on
-solarpos data
+sunce data
 ================
 
-First, run [solarpos](https://github.com/klausbrunner/solarpos) and
-capture its output in a CSV file. We’re getting position data for the
-entire year 2025 in Oulu, Finland. Depending on your setup, you may have
-to add the “java” command and an absolute path.
+First, run [sunce](https://github.com/klausbrunner/sunce) and capture
+its output in a CSV file. We’re getting position data for the entire
+year 2025 in Oulu, Finland. Depending on your setup, you may have to add
+the “java” command and an absolute path.
 
 ``` zsh
-solarpos 65.01 25.47 2025 --timezone "UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
+sunce 65.01 25.47 2025 --timezone="UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don’t need and regrouping the
@@ -30,20 +30,21 @@ sunpath <-
 sunpath
 ```
 
-    ## # A tibble: 175,200 × 4
-    ##    dateTime            zenith date        time
-    ##    <dttm>               <dbl> <date>     <dbl>
-    ##  1 2025-01-01 00:00:00   135. 2025-01-01  0   
-    ##  2 2025-01-01 00:03:00   135. 2025-01-01  0.05
-    ##  3 2025-01-01 00:06:00   135. 2025-01-01  0.1 
-    ##  4 2025-01-01 00:09:00   135. 2025-01-01  0.15
-    ##  5 2025-01-01 00:12:00   134. 2025-01-01  0.2 
-    ##  6 2025-01-01 00:15:00   134. 2025-01-01  0.25
-    ##  7 2025-01-01 00:18:00   134. 2025-01-01  0.3 
-    ##  8 2025-01-01 00:21:00   134. 2025-01-01  0.35
-    ##  9 2025-01-01 00:24:00   134. 2025-01-01  0.4 
-    ## 10 2025-01-01 00:27:00   133. 2025-01-01  0.45
+    ## # A tibble: 175,200 × 10
+    ##    latitude longitude elevation pressure temperature dateTime            deltaT
+    ##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
+    ##  1     65.0      25.5         0     1013          15 2025-01-01 00:00:00     69
+    ##  2     65.0      25.5         0     1013          15 2025-01-01 00:03:00     69
+    ##  3     65.0      25.5         0     1013          15 2025-01-01 00:06:00     69
+    ##  4     65.0      25.5         0     1013          15 2025-01-01 00:09:00     69
+    ##  5     65.0      25.5         0     1013          15 2025-01-01 00:12:00     69
+    ##  6     65.0      25.5         0     1013          15 2025-01-01 00:15:00     69
+    ##  7     65.0      25.5         0     1013          15 2025-01-01 00:18:00     69
+    ##  8     65.0      25.5         0     1013          15 2025-01-01 00:21:00     69
+    ##  9     65.0      25.5         0     1013          15 2025-01-01 00:24:00     69
+    ## 10     65.0      25.5         0     1013          15 2025-01-01 00:27:00     69
     ## # ℹ 175,190 more rows
+    ## # ℹ 3 more variables: zenith <dbl>, date <date>, time <dbl>
 
 With the nicely prepared data, plotting should be straightforward now.
 Getting the axes and labelling right is a bit of a hassle, though.
@@ -100,20 +101,21 @@ sunpath <- sunpath |>
 sunpath
 ```
 
-    ## # A tibble: 175,200 × 5
-    ##    dateTime            zenith date        time light
-    ##    <dttm>               <dbl> <date>     <dbl> <fct>
-    ##  1 2025-01-01 00:00:00   135. 2025-01-01  0    night
-    ##  2 2025-01-01 00:03:00   135. 2025-01-01  0.05 night
-    ##  3 2025-01-01 00:06:00   135. 2025-01-01  0.1  night
-    ##  4 2025-01-01 00:09:00   135. 2025-01-01  0.15 night
-    ##  5 2025-01-01 00:12:00   134. 2025-01-01  0.2  night
-    ##  6 2025-01-01 00:15:00   134. 2025-01-01  0.25 night
-    ##  7 2025-01-01 00:18:00   134. 2025-01-01  0.3  night
-    ##  8 2025-01-01 00:21:00   134. 2025-01-01  0.35 night
-    ##  9 2025-01-01 00:24:00   134. 2025-01-01  0.4  night
-    ## 10 2025-01-01 00:27:00   133. 2025-01-01  0.45 night
+    ## # A tibble: 175,200 × 11
+    ##    latitude longitude elevation pressure temperature dateTime            deltaT
+    ##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
+    ##  1     65.0      25.5         0     1013          15 2025-01-01 00:00:00     69
+    ##  2     65.0      25.5         0     1013          15 2025-01-01 00:03:00     69
+    ##  3     65.0      25.5         0     1013          15 2025-01-01 00:06:00     69
+    ##  4     65.0      25.5         0     1013          15 2025-01-01 00:09:00     69
+    ##  5     65.0      25.5         0     1013          15 2025-01-01 00:12:00     69
+    ##  6     65.0      25.5         0     1013          15 2025-01-01 00:15:00     69
+    ##  7     65.0      25.5         0     1013          15 2025-01-01 00:18:00     69
+    ##  8     65.0      25.5         0     1013          15 2025-01-01 00:21:00     69
+    ##  9     65.0      25.5         0     1013          15 2025-01-01 00:24:00     69
+    ## 10     65.0      25.5         0     1013          15 2025-01-01 00:27:00     69
     ## # ℹ 175,190 more rows
+    ## # ℹ 4 more variables: zenith <dbl>, date <date>, time <dbl>, light <fct>
 
 ``` r
 plot <- ggplot(sunpath, aes(date, time)) +

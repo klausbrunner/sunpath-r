@@ -13,26 +13,27 @@ sunce 47.795 13.047 2030 --timezone=UTC --deltat --format=csv --headers position
 
 Now read that CSV and pick data for one day of each month. While we're at it, remove all observations where the sun isn't visible anyway (i.e. zenith angle is greater than 90°) and add a convenient "month" column. This will come in handy for the diagram.
 
-```{r}
+```{r sunpath-data}
 library(tidyverse)
 library(lubridate, warn.conflicts = FALSE)
 
-sunpath <- read_csv("/tmp/sunpositions.csv", 
-                    show_col_types = FALSE) |> 
-  filter(day(dateTime) == 21) |> 
+sunpath <- read_csv("/tmp/sunpositions.csv",
+  show_col_types = FALSE
+) |>
+  filter(day(dateTime) == 21) |>
   filter(zenith <= 90.0) |>
-  mutate(month = month(dateTime, label=TRUE))
+  mutate(month = month(dateTime, label = TRUE))
 
 sunpath
 ```
 
 Now plot a simple sun path diagram.
 
-```{r}
-plot <- ggplot() + 
-  geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) + 
-  scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by=15)) + 
-  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by=15)) +
+```{r sunpath-basic}
+plot <- ggplot() +
+  geom_line(data = sunpath, aes(x = azimuth, y = zenith, group = month, colour = month)) +
+  scale_y_continuous(limits = c(0, 90), breaks = seq(0, 90, by = 15)) +
+  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 359, by = 15)) +
   labs(title = "Sun path for Salzburg, Austria in 2030") +
   coord_polar()
 
@@ -41,12 +42,12 @@ plot
 
 Let's see if we can add the analemma lines for each hour as well.
 
-```{r}
+```{r sunpath-analemma}
 hours <- sunpath |>
   filter(minute(dateTime) == 0, second(dateTime) == 0) |>
   mutate(hour = hour(dateTime))
 
-plot <- plot + 
+plot <- plot +
   geom_path(data = hours, aes(x = azimuth, y = zenith, group = hour), linetype = "dashed")
 
 plot
@@ -55,7 +56,7 @@ plot
 Let's see if we can add labels to those. This requires a bit of manual adjustment.
 
 
-```{r}
+```{r sunpath-labels}
 hour_ends <- hours |> filter(month == "Jun")
 
 plot <- plot +

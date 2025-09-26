@@ -1,5 +1,5 @@
 ---
-title: "Solar Elevation Across Europe"
+title: "Solar elevation across Europe"
 editor_options: 
   chunk_output_type: inline
 output: github_document
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 This demonstrates the `sunce` geographic sweep and time series features.
 
-## Data Generation
+## Data generation
 
 Generate solar elevation data across Europe using coordinate ranges:
 
@@ -49,8 +49,8 @@ solar_map <- ggplot(solar_data, aes(x = longitude, y = latitude)) +
   guides(fill = "none") +
   coord_quickmap(xlim = c(-10, 40), ylim = c(35, 70)) +
   labs(
-    title = "Solar Elevation",
-    subtitle = "Summer Solstice 2027, GMT noon",
+    title = "Solar elevation",
+    subtitle = "Summer solstice 2027, GMT noon",
     x = "Longitude",
     y = "Latitude",
     caption = "Generated with sunce geographic sweep."
@@ -61,7 +61,7 @@ solar_map
 
 This shows how solar elevation varies across Europe at GMT/UTC noon on the summer solstice, with higher elevations (brighter colors) in southern regions and lower elevations (darker colors) in northern regions.
 
-## Time Series 
+## Time series 
 
 Now let's see how this solar elevation pattern changes throughout the day by asking `sunce` for a combined coordinate sweep and time series in one call. Use the Grena3 algorithm to potentially save a little time.
 
@@ -90,7 +90,7 @@ time_data
 ```{r faceted-time-series, fig.width=16, fig.height=12}
 # Create faceted plot showing solar elevation throughout the day
 selected_hours <- c(8, 10, 12, 14, 16, 18)
-facet_data <- time_data |> 
+facet_data <- time_data |>
   filter(hour %in% selected_hours) |>
   mutate(hour_label = paste0(sprintf("%02d", hour), ":00 UTC"))
 
@@ -108,7 +108,7 @@ time_series_plot <- ggplot(facet_data, aes(x = longitude, y = latitude)) +
   coord_quickmap(xlim = c(-10, 40), ylim = c(35, 70)) +
   facet_wrap(~hour_label, ncol = 3) +
   labs(
-    title = "Solar Elevation Throughout the Day",
+    title = "Solar elevation throughout the day",
     subtitle = "Summer Solstice 2027",
     x = "Longitude",
     y = "Latitude",

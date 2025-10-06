@@ -1,7 +1,7 @@
 # Makefile for sunpath-r project
 
 # Default target
-all: sunpath.md carpet.md solar_maps.md solar_asia_animated.md
+all: sunpath.md carpet.md solar_maps.md solar_asia_animated.md 
 
 # Pattern rules
 %.md: %.Rmd
@@ -12,12 +12,12 @@ all: sunpath.md carpet.md solar_maps.md solar_asia_animated.md
 
 # Clean generated files
 clean:
-	rm -f sunpath.md carpet.md solar_maps.md solar_asia_animated.md
+	rm -f sunpath.md carpet.md solar_maps.md solar_asia_animated.md 
 	rm -f *.html
 	rm -rf *_files/ figure/
 	rm -f *.webp
-	rm -f /tmp/sunpositions.csv /tmp/asia_*.parquet /tmp/europe_*.csv
-	rm -f /tmp/seasonal_dates.txt /tmp/times.txt
+	rm -f /tmp/sunpositions.csv /tmp/asia_*.parquet /tmp/europe_*.csv 
+	rm -f /tmp/seasonal_dates.txt /tmp/times.txt 
 
 # Format R code in Rmd
 format:

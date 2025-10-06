@@ -28,10 +28,11 @@ write_lines(seasonal_dates, "/tmp/seasonal_dates.txt")
 # Stream sunce output directly into R using pipe (CSV format for streaming)
 # Covering from Middle East to Japan, India to Siberia
 solar_data <- read_csv(pipe(
-  "sunce 5.0:55.0:1.0 60.0:150.0:1.5 @/tmp/seasonal_dates.txt --format=csv position"
+  "sunce 5.0:55.0:1.0 60.0:150.0:1.5 @/tmp/seasonal_dates.txt --format=csv position --elevation-angle"
 ), show_col_types = FALSE) |>
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`) |>
   mutate(
-    elevation = 90 - zenith,
     season = case_when(
       as.Date(dateTime) == as.Date("2025-03-20") ~ "Spring Equinox",
       as.Date(dateTime) == as.Date("2025-06-21") ~ "Summer Solstice",
@@ -81,13 +82,15 @@ Now let's create an animated WebP using ragg 1.5+'s animation support, showing h
 ```{r animation}
 # Use Parquet format for the larger animation dataset (24 hours × many coordinates)
 system(
-  "sunce 5.0:55.0:2.0 60.0:150.0:3.0 2025-06-21 --timezone=UTC --format=parquet position --step=1h > /tmp/asia_hourly.parquet"
+  "sunce 5.0:55.0:2.0 60.0:150.0:3.0 2025-06-21 --timezone=UTC --format=parquet position --step=1h --elevation-angle > /tmp/asia_hourly.parquet"
 )
 
 # Read hourly data from Parquet file
 hourly_data <- read_parquet("/tmp/asia_hourly.parquet") |>
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`) |>
   mutate(
-    elevation = 90 - zenith,
+    dateTime = ymd_hms(dateTime), # Parse datetime string to POSIXct
     hour = hour(dateTime),
     time_label = sprintf("%02d:00 UTC", hour)
   )

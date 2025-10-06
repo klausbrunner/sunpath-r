@@ -21,11 +21,12 @@ library(lubridate)
 
 # Generate European solar elevation data using sunce geographic sweep
 system(
-  "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position > /tmp/europe_dense.csv"
+  "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position --elevation-angle > /tmp/europe_dense.csv"
 )
 
 solar_data <- read_csv("/tmp/europe_dense.csv", show_col_types = FALSE) |>
-  mutate(elevation = 90 - zenith)
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`)
 
 cat("Dataset:", nrow(solar_data), "points\n")
 cat("Elevation range:", round(min(solar_data$elevation), 1), "to", round(max(solar_data$elevation), 1), "degrees\n")
@@ -67,13 +68,14 @@ Now let's see how this solar elevation pattern changes throughout the day by ask
 
 ```{r generate-time-series}
 result <- system(
-  "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=3600 --algorithm=GRENA3 > /tmp/europe_time_series.csv"
+  "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=1h --algorithm=GRENA3 --elevation-angle > /tmp/europe_time_series.csv"
 )
 
 raw_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE)
 time_data <- raw_data |>
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`) |>
   mutate(
-    elevation = 90 - zenith,
     datetime_parsed = as.POSIXct(dateTime),
     hour = hour(datetime_parsed)
   )

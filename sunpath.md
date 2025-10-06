@@ -9,7 +9,7 @@ First, run [sunce](https://github.com/klausbrunner/sunce) and capture its output
 
 
 ``` zsh
-sunce 47.795 13.047 2030 --timezone=UTC --deltat --format=csv --headers position --step=600 > /tmp/sunpositions.csv
+sunce 47.795 13.047 2030 --timezone=UTC --deltat --format=csv --headers position --step=10m > /tmp/sunpositions.csv
 ```
 
 Now read that CSV and pick data for one day of each month. While we're at it, remove all observations where the sun isn't visible anyway (i.e. zenith angle is greater than 90°) and add a convenient "month" column. This will come in handy for the diagram.
@@ -33,16 +33,16 @@ sunpath
 ## # A tibble: 876 × 10
 ##    latitude longitude elevation pressure temperature dateTime            deltaT
 ##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
-##  1     47.8      13.0         0     1013          15 2030-01-21 06:50:00     69
-##  2     47.8      13.0         0     1013          15 2030-01-21 07:00:00     69
-##  3     47.8      13.0         0     1013          15 2030-01-21 07:10:00     69
-##  4     47.8      13.0         0     1013          15 2030-01-21 07:20:00     69
-##  5     47.8      13.0         0     1013          15 2030-01-21 07:30:00     69
-##  6     47.8      13.0         0     1013          15 2030-01-21 07:40:00     69
-##  7     47.8      13.0         0     1013          15 2030-01-21 07:50:00     69
-##  8     47.8      13.0         0     1013          15 2030-01-21 08:00:00     69
-##  9     47.8      13.0         0     1013          15 2030-01-21 08:10:00     69
-## 10     47.8      13.0         0     1013          15 2030-01-21 08:20:00     69
+##  1     47.8      13.0         0     1013          15 2030-01-21 06:50:00   74.0
+##  2     47.8      13.0         0     1013          15 2030-01-21 07:00:00   74.0
+##  3     47.8      13.0         0     1013          15 2030-01-21 07:10:00   74.0
+##  4     47.8      13.0         0     1013          15 2030-01-21 07:20:00   74.0
+##  5     47.8      13.0         0     1013          15 2030-01-21 07:30:00   74.0
+##  6     47.8      13.0         0     1013          15 2030-01-21 07:40:00   74.0
+##  7     47.8      13.0         0     1013          15 2030-01-21 07:50:00   74.0
+##  8     47.8      13.0         0     1013          15 2030-01-21 08:00:00   74.0
+##  9     47.8      13.0         0     1013          15 2030-01-21 08:10:00   74.0
+## 10     47.8      13.0         0     1013          15 2030-01-21 08:20:00   74.0
 ## # ℹ 866 more rows
 ## # ℹ 3 more variables: azimuth <dbl>, zenith <dbl>, month <ord>
 ```

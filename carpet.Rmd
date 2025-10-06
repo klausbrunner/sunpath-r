@@ -9,7 +9,7 @@ First, run [sunce](https://github.com/klausbrunner/sunce) and capture its output
 
 
 ```{zsh}
-sunce 65.01 25.47 2025 --timezone="UTC" --deltat --format=csv --headers position --step=180 > /tmp/sunpositions.csv
+sunce 65.01 25.47 2025 --timezone="UTC" --deltat --format=csv --headers position --step=3m > /tmp/sunpositions.csv
 ```
 
 Now read that CSV file, dropping what we don't need and regrouping the data a bit for convenient plotting.

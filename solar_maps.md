@@ -20,11 +20,12 @@ library(lubridate)
 
 # Generate European solar elevation data using sunce geographic sweep
 system(
-  "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position > /tmp/europe_dense.csv"
+  "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position --elevation-angle > /tmp/europe_dense.csv"
 )
 
 solar_data <- read_csv("/tmp/europe_dense.csv", show_col_types = FALSE) |>
-  mutate(elevation = 90 - zenith)
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`)
 
 cat("Dataset:", nrow(solar_data), "points\n")
 ```
@@ -81,13 +82,14 @@ Now let's see how this solar elevation pattern changes throughout the day by ask
 
 ``` r
 result <- system(
-  "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=3600 --algorithm=GRENA3 > /tmp/europe_time_series.csv"
+  "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=1h --algorithm=GRENA3 --elevation-angle > /tmp/europe_time_series.csv"
 )
 
 raw_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE)
 time_data <- raw_data |>
+  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  rename(elevation = `elevation-angle`) |>
   mutate(
-    elevation = 90 - zenith,
     datetime_parsed = as.POSIXct(dateTime),
     hour = hour(datetime_parsed)
   )
@@ -108,22 +110,21 @@ time_data
 ```
 
 ```
-## # A tibble: 7,917 × 11
-##    latitude longitude elevation pressure temperature dateTime            deltaT
-##       <dbl>     <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>
-##  1       32       -13      2.02     1013          15 2027-06-21 06:00:00      0
-##  2       32       -11      3.46     1013          15 2027-06-21 06:00:00      0
-##  3       32        -9      4.94     1013          15 2027-06-21 06:00:00      0
-##  4       32        -7      6.46     1013          15 2027-06-21 06:00:00      0
-##  5       32        -5      7.99     1013          15 2027-06-21 06:00:00      0
-##  6       32        -3      9.55     1013          15 2027-06-21 06:00:00      0
-##  7       32        -1     11.1      1013          15 2027-06-21 06:00:00      0
-##  8       32         1     12.7      1013          15 2027-06-21 06:00:00      0
-##  9       32         3     14.3      1013          15 2027-06-21 06:00:00      0
-## 10       32         5     15.9      1013          15 2027-06-21 06:00:00      0
-## # ℹ 7,907 more rows
-## # ℹ 4 more variables: azimuth <dbl>, zenith <dbl>, datetime_parsed <dttm>,
-## #   hour <int>
+## # A tibble: 8,294 × 10
+##    latitude longitude pressure temperature dateTime            deltaT azimuth
+##       <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>   <dbl>
+##  1       32       -13     1013          15 2027-06-21 06:00:00      0    63.2
+##  2       32       -11     1013          15 2027-06-21 06:00:00      0    64.3
+##  3       32        -9     1013          15 2027-06-21 06:00:00      0    65.3
+##  4       32        -7     1013          15 2027-06-21 06:00:00      0    66.3
+##  5       32        -5     1013          15 2027-06-21 06:00:00      0    67.2
+##  6       32        -3     1013          15 2027-06-21 06:00:00      0    68.2
+##  7       32        -1     1013          15 2027-06-21 06:00:00      0    69.1
+##  8       32         1     1013          15 2027-06-21 06:00:00      0    70.1
+##  9       32         3     1013          15 2027-06-21 06:00:00      0    71.0
+## 10       32         5     1013          15 2027-06-21 06:00:00      0    71.9
+## # ℹ 8,284 more rows
+## # ℹ 3 more variables: elevation <dbl>, datetime_parsed <dttm>, hour <int>
 ```
 
 

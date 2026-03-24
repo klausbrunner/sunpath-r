@@ -17,14 +17,16 @@ Generate solar elevation data across Europe using coordinate ranges:
 ``` r
 library(tidyverse)
 library(lubridate)
+library(maps)
 
-# Generate European solar elevation data using sunce geographic sweep
+world_map <- map_data("world")
+
 system(
   "sunce --format=csv 32.0:73.0:0.5 -13.0:43.0:0.5 2027-06-21T12:00:00Z position --elevation-angle > /tmp/europe_dense.csv"
 )
 
 solar_data <- read_csv("/tmp/europe_dense.csv", show_col_types = FALSE) |>
-  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+  select(-elevation) |>
   rename(elevation = `elevation-angle`)
 
 cat("Dataset:", nrow(solar_data), "points\n")
@@ -49,11 +51,13 @@ Create a filled contour map showing solar elevation gradients:
 
 ``` r
 solar_map <- ggplot(solar_data, aes(x = longitude, y = latitude)) +
-  borders(
-    "world",
+  geom_polygon(
+    data = world_map,
+    aes(x = long, y = lat, group = group),
+    inherit.aes = FALSE,
     colour = "white",
     fill = "grey20",
-    size = 0.3,
+    linewidth = 0.3,
     alpha = 0.8
   ) +
   geom_contour_filled(aes(z = elevation), alpha = 0.85, bins = 20) +
@@ -81,18 +85,14 @@ Now let's see how this solar elevation pattern changes throughout the day by ask
 
 
 ``` r
-result <- system(
+system(
   "sunce --format=csv --headers 32.0:73.0:2.0 -13.0:43.0:2.0 2027-06-21 --timezone=UTC position --step=1h --algorithm=GRENA3 --elevation-angle > /tmp/europe_time_series.csv"
 )
 
-raw_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE)
-time_data <- raw_data |>
-  select(-elevation) |> # Drop elevation input column to avoid naming conflict
+time_data <- read_csv("/tmp/europe_time_series.csv", show_col_types = FALSE) |>
+  select(-elevation) |>
   rename(elevation = `elevation-angle`) |>
-  mutate(
-    datetime_parsed = as.POSIXct(dateTime),
-    hour = hour(datetime_parsed)
-  )
+  mutate(hour = hour(as.POSIXct(dateTime)))
 
 cat("Unique hours in data:", sort(unique(time_data$hour)), "\n")
 ```
@@ -103,14 +103,14 @@ cat("Unique hours in data:", sort(unique(time_data$hour)), "\n")
 
 ``` r
 time_data <- time_data |>
-  filter(hour >= 6, hour <= 18, !is.na(elevation)) %>%
+  filter(hour >= 6, hour <= 18, !is.na(elevation)) |>
   arrange(hour, latitude, longitude)
 
 time_data
 ```
 
 ```
-## # A tibble: 8,294 × 10
+## # A tibble: 8,294 × 9
 ##    latitude longitude pressure temperature dateTime            deltaT azimuth
 ##       <dbl>     <dbl>    <dbl>       <dbl> <dttm>               <dbl>   <dbl>
 ##  1       32       -13     1013          15 2027-06-21 06:00:00      0    63.2
@@ -124,23 +124,24 @@ time_data
 ##  9       32         3     1013          15 2027-06-21 06:00:00      0    71.0
 ## 10       32         5     1013          15 2027-06-21 06:00:00      0    71.9
 ## # ℹ 8,284 more rows
-## # ℹ 3 more variables: elevation <dbl>, datetime_parsed <dttm>, hour <int>
+## # ℹ 2 more variables: elevation <dbl>, hour <int>
 ```
 
 
 ``` r
-# Create faceted plot showing solar elevation throughout the day
 selected_hours <- c(8, 10, 12, 14, 16, 18)
 facet_data <- time_data |>
   filter(hour %in% selected_hours) |>
   mutate(hour_label = paste0(sprintf("%02d", hour), ":00 UTC"))
 
 time_series_plot <- ggplot(facet_data, aes(x = longitude, y = latitude)) +
-  borders(
-    "world",
+  geom_polygon(
+    data = world_map,
+    aes(x = long, y = lat, group = group),
+    inherit.aes = FALSE,
     colour = "white",
     fill = "grey20",
-    size = 0.3,
+    linewidth = 0.3,
     alpha = 0.8
   ) +
   geom_contour_filled(aes(z = elevation), alpha = 0.85, bins = 20) +
